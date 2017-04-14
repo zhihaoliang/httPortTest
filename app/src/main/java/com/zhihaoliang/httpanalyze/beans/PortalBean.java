@@ -15,6 +15,9 @@ public class PortalBean {
     @Element(name = "name")
     private String name;
 
+    @Element(name = "nameData")
+    private String nameData;
+
     @Element(name = "dis")
     private String dis;
 
@@ -54,5 +57,9 @@ public class PortalBean {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getNameData() {
+        return nameData;
     }
 }

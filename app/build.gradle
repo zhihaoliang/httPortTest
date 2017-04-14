@@ -49,6 +49,11 @@ dependencies {
     //权限管理工具
     compile 'com.karumi:dexter:4.0.0'
 
+    //一些UI的支持
+    compile 'com.zhihaoliang.util.ui:libui:1.2'
+    //一些UI的支持
+    compile 'com.zhihaoliang.util.dialog:libdialog:1.1'
+
     compile 'com.jcodecraeer:xrecyclerview:1.2.7'
 
     compile ('com.squareup.retrofit2:converter-simplexml:2.1.0'){

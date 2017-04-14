@@ -26,7 +26,7 @@
                 android:layout_gravity="center"
                 android:ellipsize="end"
                 android:gravity="center"
-                android:singleLine="true"
+                android:lines="1"
                 android:text="网址输入"
                 android:textColor="#333"
                 android:textSize="20sp" />
@@ -35,7 +35,6 @@
     </android.support.design.widget.AppBarLayout>
 
     <com.jcodecraeer.xrecyclerview.XRecyclerView
-        android:background="#FF0"
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

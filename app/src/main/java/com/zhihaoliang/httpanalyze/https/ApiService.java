@@ -10,6 +10,8 @@ import retrofit2.Call;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Url;
 
 /**
  * Created by haoliang on 2017/3/28.
@@ -17,12 +19,12 @@ import retrofit2.http.GET;
  */
 
 public interface ApiService {
-
     /**
      * 登陆接口
      */
     @FormUrlEncoded
-    Call<String> connact(@FieldMap HashMap<String, String> map);
+    @POST
+    Call<String> connact(@Url String url, @FieldMap HashMap<String, String> map);
 
     @GET("examples/frameweb/root.xml")
     Call<ListBean> initDate();

@@ -1,6 +1,8 @@
 package com.zhihaoliang.httpanalyze.https;
 
 
+import android.text.TextUtils;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -8,6 +10,7 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by haoliang on 2017/3/28.
@@ -20,7 +23,7 @@ public class HttpApi {
     //ScalarsConverterFactory
 
     public static synchronized ApiService ApiTypeService(String url) {
-       return ApiTypeService(url,GsonConverterFactory.create());
+       return ApiTypeService(url, ScalarsConverterFactory.create());
     }
     public static synchronized ApiService ApiTypeService(String url, Converter.Factory factory) {
         OkHttpClient httpClient = new OkHttpClient()
@@ -29,7 +32,11 @@ public class HttpApi {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .build();
-        Retrofit retrofit = new Retrofit.Builder()
+        Retrofit retrofit =TextUtils.isEmpty(url)?new Retrofit.Builder()
+                .addConverterFactory(factory)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(httpClient)
+                .build(): new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(factory)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
