@@ -21,8 +21,14 @@ public class PortalBean {
     @Element(name = "dis")
     private String dis;
 
-    @Element(name = "url")
+    @Element(name = "url",required = false)
     private String url;
+
+    @Element(name = "dvcCode")
+    private String  dvcCode;
+
+    @Element(name = "encryptKey")
+    private String encryptKey;
 
     @ElementList(inline = true, entry = "property")
     public ArrayList<PropertyBean> portal;
@@ -61,5 +67,13 @@ public class PortalBean {
 
     public String getNameData() {
         return nameData;
+    }
+
+    public String getDvcCode() {
+        return dvcCode;
+    }
+
+    public String getEncryptKey() {
+        return encryptKey;
     }
 }

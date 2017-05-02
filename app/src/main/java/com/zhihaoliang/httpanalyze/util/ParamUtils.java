@@ -17,49 +17,23 @@ import java.util.Map;
 
 public class ParamUtils {
 
-    public static HashMap<String, String> getParam(String svceName,String data) {
+    public static HashMap<String, String> getParam(String svceName,String data,String dvcCode,String encryptKey) {
         HashMap<String, String> param = new HashMap<>();
 
-        String deviceId = MyApplication.sMyApplication.getDeviceId();
-        String dvcCode = DeviceUtils.getDeviceIMSI(MyApplication.sMyApplication);
-
         param.put("svceName", svceName);
-        if (svceName.equals("activate")) {
-            param.put("dvcCode", dvcCode); //激活接口用乾坤服务方提供的指定的dvcCode
-        } else {
-            param.put("dvcCode", deviceId); //其它接口都用激活后返回的设备ID---deviceId
-        }
+        param.put("dvcCode", dvcCode); //其它接口都用激活后返回的设备ID---deviceId
         param.put("charset", "GBK");
         param.put("rtnType", "json");
         param.put("type", "json");
         param.put("data", data);
-        param.put("sign", sign(param, deviceId, dvcCode));
+        param.put("sign", sign(param, encryptKey));
 
         return param;
     }
 
-    private static String sign(Map<String, String> params, String deviceId, String dvcCode) {
+    private static String sign(Map<String, String> params, String encryptKey) {
         String tempMd5 = createLinkString(params); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
-        // 加密串最后要加上密钥串
-        switch (params.get("svceName")) {
-            case "activate":
-                tempMd5 = tempMd5 + dvcCode; // 激活接口的密钥串=设备编号
-                break;
-            case "login":
-            case "forgetPwd":
-                if (deviceId == null) {
-                    deviceId = "";
-                }
-                tempMd5 = tempMd5 + deviceId;
-                break;
-            default:
-                String encryptKey = MyApplication.sMyApplication.getEncryptKey();
-                if (encryptKey == null) {
-                    encryptKey = "";
-                }
-                tempMd5 = tempMd5 + encryptKey;
-                break;
-        }
+         tempMd5 = tempMd5 + encryptKey;
 
         //md5 加密
         tempMd5 = MD5Util.MD5Encode(tempMd5);

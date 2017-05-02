@@ -20,11 +20,5 @@ public class MyApplication extends Application{
         sMyApplication = this;
     }
 
-    public String getDeviceId(){
-        return "43";
-    }
 
-    public String getEncryptKey(){
-        return null;
-    }
 }
