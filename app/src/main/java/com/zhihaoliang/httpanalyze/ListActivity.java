@@ -152,13 +152,19 @@ public class ListActivity extends AppCompatActivity {
                         String url = getUrl(postion);
                         String methodName = mListBean.getPortal().get(postion).getName();
                         String dataName = mListBean.getPortal().get(postion).getNameData();
-                        String dvcCode = mListBean.getPortal().get(postion).getDvcCode();
-                        String encryptKey = mListBean.getPortal().get(postion).getEncryptKey();
+                        String dvcCode =getParams(mListBean.getPortal().get(postion).getDvcCode());
+                        if(TextUtils.isEmpty(dvcCode)){
+                            return;
+                        }
+                        String encryptKey = getParams(mListBean.getPortal().get(postion).getEncryptKey());
+                        if(TextUtils.isEmpty(encryptKey)){
+                            return;
+                        }
 
                         String data = getReqData(postion, dataName);
                         Log.log(this, data);
 
-                        HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data,getParams(dvcCode),getParams(encryptKey));
+                        HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data,dvcCode,encryptKey);
 
                         mMyProgressDialog.show();
                         doConnact(url, hashMap, methodName);
@@ -177,12 +183,11 @@ public class ListActivity extends AppCompatActivity {
         param = param.replace("$}", "");
 
         if (param.toUpperCase().equals("IMSI")) {
-            return DeviceUtils.getDeviceId(this);
+            return DeviceUtils.getDeviceIMSI(this);
         }
+        String[] params = param.split("\\.");
 
-        String[] params = param.split(".");
-
-        if (mHashMap.containsKey(params[0])) {
+        if (!mHashMap.containsKey(params[0])) {
             Toast.makeText(this, "请先调用方法" + params[0], Toast.LENGTH_SHORT).show();
             return null;
         }
