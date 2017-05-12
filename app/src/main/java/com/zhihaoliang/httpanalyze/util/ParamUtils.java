@@ -17,14 +17,19 @@ import java.util.Map;
 
 public class ParamUtils {
 
-    public static HashMap<String, String> getParam(String svceName,String data,String dvcCode,String encryptKey) {
+    public static HashMap<String, String> getParam(String svceName,String data,String dvcCode,String encryptKey ,boolean isOnlyXml) {
         HashMap<String, String> param = new HashMap<>();
 
         param.put("svceName", svceName);
         param.put("dvcCode", dvcCode); //其它接口都用激活后返回的设备ID---deviceId
         param.put("charset", "GBK");
-        param.put("rtnType", "json");
-        param.put("type", "json");
+        if(isOnlyXml){
+            param.put("rtnType", "xml");
+            param.put("type", "xml");
+        }else{
+            param.put("rtnType", "json");
+            param.put("type", "json");
+        }
         param.put("data", data);
         param.put("sign", sign(param, encryptKey));
 

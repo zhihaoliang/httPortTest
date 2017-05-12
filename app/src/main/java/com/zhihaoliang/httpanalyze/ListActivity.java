@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.internal.ObjectConstructor;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.zhihaoliang.httpanalyze.beans.ListBean;
 import com.zhihaoliang.httpanalyze.beans.PortalBean;
@@ -101,6 +100,9 @@ public class ListActivity extends AppCompatActivity {
                 if (xRecyclerView != null) {
                     xRecyclerView.refreshComplete();
                 }
+                if(t != null){
+                    Log.LogGson(this,t);
+                }
                 Toast.makeText(ListActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
             }
         });
@@ -152,19 +154,20 @@ public class ListActivity extends AppCompatActivity {
                         String url = getUrl(postion);
                         String methodName = mListBean.getPortal().get(postion).getName();
                         String dataName = mListBean.getPortal().get(postion).getNameData();
-                        String dvcCode =getParams(mListBean.getPortal().get(postion).getDvcCode());
-                        if(TextUtils.isEmpty(dvcCode)){
+                        String dvcCode = getParams(mListBean.getPortal().get(postion).getDvcCode());
+                        boolean isOnlyXml = mListBean.getPortal().get(postion).isOnlyXml();
+                        if (TextUtils.isEmpty(dvcCode)) {
                             return;
                         }
                         String encryptKey = getParams(mListBean.getPortal().get(postion).getEncryptKey());
-                        if(TextUtils.isEmpty(encryptKey)){
+                        if (TextUtils.isEmpty(encryptKey)) {
                             return;
                         }
 
-                        String data = getReqData(postion, dataName);
+                        String data = getReqData(postion, dataName,isOnlyXml);
                         Log.log(this, data);
 
-                        HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data,dvcCode,encryptKey);
+                        HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data, dvcCode, encryptKey,isOnlyXml);
 
                         mMyProgressDialog.show();
                         doConnact(url, hashMap, methodName);
@@ -196,9 +199,9 @@ public class ListActivity extends AppCompatActivity {
         try {
             JSONObject jsonObject = new JSONObject(object);
             for (int i = 1; i < params.length; i++) {
-                if (i == params.length - 1){
-                    return  jsonObject.getString(params[i]);
-                }else{
+                if (i == params.length - 1) {
+                    return jsonObject.getString(params[i]);
+                } else {
                     jsonObject = jsonObject.getJSONObject(params[i]);
                 }
             }
@@ -207,22 +210,49 @@ public class ListActivity extends AppCompatActivity {
         }
 
         Toast.makeText(this, "Json 解析错误", Toast.LENGTH_SHORT).show();
-       return null;
+        return null;
     }
 
-    private String getReqData(int postion, String dataName) {
-        ArrayList<PropertyBean> arrayList = mListBean.getPortal().get(postion).getPortal();
+    private String getReqData(int postion, String dataName, boolean isOnlyXml) {
+        ArrayList<PropertyBean> arrayList = mListBean.getPortal().get(postion).getProperty();
+        ArrayList<String> con = mListBean.getPortal().get(postion).getConstant();
+
         HashMap<String, String> hashMap = new HashMap<>();
-        for (PropertyBean propertyBean : arrayList) {
-            hashMap.put(propertyBean.getName(), propertyBean.getValue());
+        if (arrayList != null && arrayList.size() > 0) {
+            for (PropertyBean propertyBean : arrayList) {
+                hashMap.put(propertyBean.getName(), propertyBean.getValue());
+            }
         }
 
+        if(con != null && con.size() >0){
+            for (String s : con) {
+                PropertyBean propertyBean = getProperty(s);
+                hashMap.put(propertyBean.getName(), propertyBean.getValue());
+            }
+        }
+
+
         StringBuffer data = new StringBuffer();
-        data.append("{ \"methodName\":".replace("methodName", dataName));
-        data.append(GSON.toJson(hashMap));
-        data.append("}");
+        if(isOnlyXml){
+            data.append("<methodName>".replace("methodName", dataName));
+            data.append("</methodName>".replace("methodName", dataName));
+        }else{
+            data.append("{ \"methodName\":".replace("methodName", dataName));
+            data.append(GSON.toJson(hashMap));
+            data.append("}");
+        }
 
         return data.toString();
+    }
+
+    private PropertyBean getProperty(String name){
+        ArrayList<PropertyBean> property = mListBean.getProperty();
+        for (PropertyBean propertyBean : property) {
+            if(name.equals(propertyBean.getName())){
+                return  propertyBean;
+            }
+        }
+        return null;
     }
 
     private String getUrl(int postion) {

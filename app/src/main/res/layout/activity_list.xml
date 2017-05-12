@@ -27,7 +27,7 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:lines="1"
-                android:text="网址输入"
+                android:text="接口列表"
                 android:textColor="#333"
                 android:textSize="20sp" />
         </android.support.v7.widget.Toolbar>

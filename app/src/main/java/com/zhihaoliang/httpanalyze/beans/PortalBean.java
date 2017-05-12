@@ -18,6 +18,9 @@ public class PortalBean {
     @Element(name = "nameData")
     private String nameData;
 
+    @Element(name = "isOnlyXml",required = false)
+    private boolean isOnlyXml;
+
     @Element(name = "dis")
     private String dis;
 
@@ -30,8 +33,11 @@ public class PortalBean {
     @Element(name = "encryptKey")
     private String encryptKey;
 
-    @ElementList(inline = true, entry = "property")
-    public ArrayList<PropertyBean> portal;
+    @ElementList(inline = true, entry = "property",required = false)
+    public ArrayList<PropertyBean> property;
+
+    @ElementList(inline = true, entry = "constant",required = false)
+    private ArrayList<String> constant;
 
     public String getName() {
         return name;
@@ -49,13 +55,10 @@ public class PortalBean {
         this.dis = dis;
     }
 
-    public ArrayList<PropertyBean> getPortal() {
-        return portal;
+    public ArrayList<PropertyBean> getProperty() {
+        return property;
     }
 
-    public void setPortal(ArrayList<PropertyBean> portal) {
-        this.portal = portal;
-    }
 
     public String getUrl() {
         return url;
@@ -75,5 +78,13 @@ public class PortalBean {
 
     public String getEncryptKey() {
         return encryptKey;
+    }
+
+    public boolean isOnlyXml() {
+        return isOnlyXml;
+    }
+
+    public ArrayList<String> getConstant() {
+        return constant;
     }
 }

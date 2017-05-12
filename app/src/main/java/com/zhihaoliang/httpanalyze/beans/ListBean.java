@@ -18,19 +18,18 @@ public class ListBean {
     @Element(name = "baseUrl")
     private String baseUrl;
 
+    @ElementList(inline = true, entry = "property",required = false)
+    public ArrayList<PropertyBean> property;
+
     public ArrayList<PortalBean> getPortal() {
         return portal;
-    }
-
-    public void setPortal(ArrayList<PortalBean> portal) {
-        this.portal = portal;
     }
 
     public String getBaseUrl() {
         return baseUrl;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public ArrayList<PropertyBean> getProperty() {
+        return property;
     }
 }
