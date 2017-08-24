@@ -4,6 +4,7 @@ import android.util.Base64;
 
 import com.zhihaoliang.httpanalyze.MyApplication;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +44,12 @@ public class ParamUtils {
         //md5 加密
         tempMd5 = MD5Util.MD5Encode(tempMd5);
         //Base64加密
-        byte[] dates = tempMd5.getBytes();
+        byte[] dates = new byte[0];
+        try {
+            dates = tempMd5.getBytes("GBK");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return  Base64.encodeToString(dates,Base64.NO_WRAP);
     }
 

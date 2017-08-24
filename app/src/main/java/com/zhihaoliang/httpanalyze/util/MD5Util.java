@@ -7,6 +7,7 @@ package com.zhihaoliang.httpanalyze.util;
 
 import android.text.TextUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -15,10 +16,9 @@ public class MD5Util {
         if (TextUtils.isEmpty(string)) {
             return "";
         }
-        MessageDigest md5 = null;
         try {
-            md5 = MessageDigest.getInstance("MD5");
-            byte[] bytes = md5.digest(string.getBytes());
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] bytes = md5.digest(string.getBytes("GBK"));
             String result = "";
             for (byte b : bytes) {
                 String temp = Integer.toHexString(b & 0xff);
@@ -29,6 +29,8 @@ public class MD5Util {
             }
             return result;
         } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return "";

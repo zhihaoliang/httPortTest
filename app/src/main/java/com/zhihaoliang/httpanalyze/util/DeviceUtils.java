@@ -12,7 +12,8 @@ public class DeviceUtils {
 
     public static String getDeviceIMSI(Context ct){
         TelephonyManager tm = (TelephonyManager)  ct.getSystemService(Context.TELEPHONY_SERVICE);
-        return tm.getSubscriberId();
+        return "460023367301591";
+       // return tm.getSubscriberId();
     }
 
     public static String getNativePhoneNumber(Context ct) {

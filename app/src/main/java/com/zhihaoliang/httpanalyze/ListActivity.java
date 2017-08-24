@@ -17,6 +17,7 @@ import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.zhihaoliang.httpanalyze.beans.ListBean;
 import com.zhihaoliang.httpanalyze.beans.PortalBean;
 import com.zhihaoliang.httpanalyze.beans.PropertyBean;
+import com.zhihaoliang.httpanalyze.beans.PropertyListBean;
 import com.zhihaoliang.httpanalyze.https.ApiService;
 import com.zhihaoliang.httpanalyze.https.HttpApi;
 import com.zhihaoliang.httpanalyze.util.DeviceUtils;
@@ -27,8 +28,11 @@ import com.zhihaoliang.util.ui.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,6 +53,8 @@ public class ListActivity extends AppCompatActivity {
     private MyProgressDialog mMyProgressDialog;
 
     private static final Gson GSON = new Gson();
+
+    private static final String DATA_FORMAT = "yyyy-MM-dd";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,8 +106,8 @@ public class ListActivity extends AppCompatActivity {
                 if (xRecyclerView != null) {
                     xRecyclerView.refreshComplete();
                 }
-                if(t != null){
-                    Log.LogGson(this,t);
+                if (t != null) {
+                    Log.LogGson(this, t);
                 }
                 Toast.makeText(ListActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
             }
@@ -163,14 +169,23 @@ public class ListActivity extends AppCompatActivity {
                         if (TextUtils.isEmpty(encryptKey)) {
                             return;
                         }
+                        ArrayList<PropertyListBean> list = mListBean.getPortal().get(postion).list;
+                        if (list == null || list.size() == 0) {
+                            String data = getReqData(postion, dataName, isOnlyXml, false);
+                            Log.log(this, data);
 
-                        String data = getReqData(postion, dataName,isOnlyXml);
-                        Log.log(this, data);
+                            HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data, dvcCode, encryptKey, isOnlyXml);
 
-                        HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data, dvcCode, encryptKey,isOnlyXml);
+                            mMyProgressDialog.show();
+                            doConnact(url, hashMap, methodName);
+                        } else {
+                            String temp = getReqData(postion, dataName, isOnlyXml, true);
+                            String data = "{\"list\":[" + temp + "]}";
+                            HashMap<String, String> hashMap = ParamUtils.getParam(methodName, data, dvcCode, encryptKey, isOnlyXml);
 
-                        mMyProgressDialog.show();
-                        doConnact(url, hashMap, methodName);
+                            mMyProgressDialog.show();
+                            doConnact(url, hashMap, methodName);
+                        }
                     }
                 });
             }
@@ -188,6 +203,19 @@ public class ListActivity extends AppCompatActivity {
         if (param.toUpperCase().equals("IMSI")) {
             return DeviceUtils.getDeviceIMSI(this);
         }
+
+        if (param.toLowerCase().equals("today_start")) {
+            return getStartDay();
+        }
+        if (param.toLowerCase().equals("today_end")) {
+            return getEndDay();
+        }
+
+        PropertyBean property = getProperty(param);
+        if (property != null) {
+            return property.getValue();
+        }
+
         String[] params = param.split("\\.");
 
         if (!mHashMap.containsKey(params[0])) {
@@ -213,18 +241,30 @@ public class ListActivity extends AppCompatActivity {
         return null;
     }
 
-    private String getReqData(int postion, String dataName, boolean isOnlyXml) {
-        ArrayList<PropertyBean> arrayList = mListBean.getPortal().get(postion).getProperty();
+    private static final String getStartDay() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_FORMAT);
+        String data = simpleDateFormat.format(new Date());
+        return data + " 00:00:00";
+    }
+
+    private static final String getEndDay() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATA_FORMAT);
+        String data = simpleDateFormat.format(new Date());
+        return data + " 23:59:59";
+    }
+
+    private String getReqData(int postion, String dataName, boolean isOnlyXml, boolean isList) {
+        ArrayList<PropertyBean> arrayList = isList ? mListBean.getPortal().get(postion).list.get(0).property : mListBean.getPortal().get(postion).getProperty();
         ArrayList<String> con = mListBean.getPortal().get(postion).getConstant();
 
         HashMap<String, String> hashMap = new HashMap<>();
         if (arrayList != null && arrayList.size() > 0) {
             for (PropertyBean propertyBean : arrayList) {
-                hashMap.put(propertyBean.getName(), propertyBean.getValue());
+                hashMap.put(propertyBean.getName(), getParams(propertyBean.getValue()));
             }
         }
 
-        if(con != null && con.size() >0){
+        if (con != null && con.size() > 0) {
             for (String s : con) {
                 PropertyBean propertyBean = getProperty(s);
                 hashMap.put(propertyBean.getName(), propertyBean.getValue());
@@ -233,10 +273,10 @@ public class ListActivity extends AppCompatActivity {
 
 
         StringBuffer data = new StringBuffer();
-        if(isOnlyXml){
+        if (isOnlyXml) {
             data.append("<methodName>".replace("methodName", dataName));
             data.append("</methodName>".replace("methodName", dataName));
-        }else{
+        } else {
             data.append("{ \"methodName\":".replace("methodName", dataName));
             data.append(GSON.toJson(hashMap));
             data.append("}");
@@ -245,11 +285,11 @@ public class ListActivity extends AppCompatActivity {
         return data.toString();
     }
 
-    private PropertyBean getProperty(String name){
+    private PropertyBean getProperty(String name) {
         ArrayList<PropertyBean> property = mListBean.getProperty();
         for (PropertyBean propertyBean : property) {
-            if(name.equals(propertyBean.getName())){
-                return  propertyBean;
+            if (name.equals(propertyBean.getName())) {
+                return propertyBean;
             }
         }
         return null;

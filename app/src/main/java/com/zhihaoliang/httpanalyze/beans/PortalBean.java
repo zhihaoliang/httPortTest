@@ -36,6 +36,9 @@ public class PortalBean {
     @ElementList(inline = true, entry = "property",required = false)
     public ArrayList<PropertyBean> property;
 
+    @ElementList(inline = true, entry = "list",required = false)
+    public ArrayList<PropertyListBean> list;
+
     @ElementList(inline = true, entry = "constant",required = false)
     private ArrayList<String> constant;
 
@@ -87,4 +90,6 @@ public class PortalBean {
     public ArrayList<String> getConstant() {
         return constant;
     }
+
+
 }

@@ -32,4 +32,6 @@ public class ListBean {
     public ArrayList<PropertyBean> getProperty() {
         return property;
     }
+
+
 }
